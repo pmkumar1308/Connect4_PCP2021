@@ -1,0 +1,1 @@
+from .minimax import generate_move_minimax as gen_move_minimax
