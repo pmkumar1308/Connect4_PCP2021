@@ -101,7 +101,7 @@ def minimax(depth: int, board: np.ndarray, player: BoardPiece, alpha, beta, maxi
             valid_columns.append(col)
 
     if depth == 0 or check_end_state(board,player).name == GameState.IS_WIN or len(valid_columns) == 0:
-        if check_end_state(board,player).name == GameState.IS_WIN or len(valid_columns) == 0:
+        if check_end_state(board, player).name == GameState.IS_WIN or len(valid_columns) == 0:
             if connected_four(board_copy, BoardPiece(2)):
                 return None, math.inf
             elif connected_four(board_copy, BoardPiece(1)):
