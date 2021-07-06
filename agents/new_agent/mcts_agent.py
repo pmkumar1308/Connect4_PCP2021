@@ -3,7 +3,7 @@ from collections import defaultdict
 from typing import Optional, Tuple
 from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2, connected_four_convolve, \
     connected_four, ROWS, \
-    COLUMNS, apply_player_action, \
+    COLUMNS, apply_player_action, get_valid_columns, \
     check_end_state, GameState
 
 
@@ -92,6 +92,7 @@ from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2
 #         return action
 
 class MonteCarloTreeSearchNode():
+
     def __init__(self, state, player, parent=None, parent_action=None):
         self.state = state
         self.parent = parent
@@ -108,7 +109,7 @@ class MonteCarloTreeSearchNode():
         return
 
     def untried_actions(self):
-        self._untried_actions = self.get_valid_columns()
+        self._untried_actions = get_valid_columns(self.state)
         return self._untried_actions
 
     def q(self):
@@ -134,12 +135,12 @@ class MonteCarloTreeSearchNode():
     def rollout(self):
         current_rollout_state = self.state
 
-        while not current_rollout_state.is_game_over():
-            possible_moves = current_rollout_state.get_valid_columns()
+        while not self.is_game_over():
+            possible_moves = get_valid_columns(current_rollout_state)
 
             action = self.rollout_policy(possible_moves)
-            current_rollout_state = current_rollout_state.move(action)
-        return current_rollout_state.game_result()
+            current_rollout_state = self.move(action)
+        return self.game_result()
 
     def backpropagate(self, result):
         self._number_of_visits += 1.
@@ -150,7 +151,7 @@ class MonteCarloTreeSearchNode():
     def is_fully_expanded(self):
         return len(self._untried_actions) == 0
 
-    def best_child(self, c_param=0.1):
+    def best_child(self, c_param = 1.414):
 
         choices_weights = [(c.q() / c.n()) + c_param * np.sqrt((2 * np.log(self.n()) / c.n())) for c in self.children]
         return self.children[np.argmax(choices_weights)]
@@ -178,20 +179,15 @@ class MonteCarloTreeSearchNode():
             reward = v.rollout()
             v.backpropagate(reward)
 
-        return self.best_child(c_param=0.)
+        return self.best_child()
 
-    def get_valid_columns(self):
-        self.valid_columns = []
-        for col in range(COLUMNS):
-            if self.state[ROWS - 1][col] == 0:
-                self.valid_columns.append(col)
-        return self.valid_columns
 
     def is_game_over(self):
         return connected_four(self.state, self.player)
 
     def move(self, action):
-        apply_player_action(self.state, action, self.player)
+        b = apply_player_action(self.state, action, self.player)
+        return b
 
     def game_result(self):
         if check_end_state(self.state, self.player).name == GameState.IS_WIN:
@@ -203,6 +199,9 @@ class MonteCarloTreeSearchNode():
 def generate_move_mcts(board: np.ndarray, player: BoardPiece, saved_state: Optional[SavedState]
                        ) -> Tuple[PlayerAction, Optional[SavedState]]:
     root = MonteCarloTreeSearchNode(state=board, player=player)
+    # print('a')
     selected_node = root.best_action()
-    action = PlayerAction(int(selected_node))
-    return action
+    # print('The selected node is',selected_node)
+    action = PlayerAction(int(selected_node.parent_action))
+    return action, saved_state
+

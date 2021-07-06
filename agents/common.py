@@ -66,7 +66,7 @@ def pretty_print_board(board: np.ndarray) -> str:
             NO_PLAYER_PRINT if board[y][x] == NO_PLAYER else PLAYER1_PRINT if board[y][x] == PLAYER1 else PLAYER2_PRINT
             for x in range(COLUMNS)) + str(' |'))
     print('|===============|')
-    print(str('| ') + ' '.join(map(str, range(COLUMNS))) + str(' |'))
+    # print(str('| ') + ' '.join(map(str, range(COLUMNS))) + str(' |'))
     print()
 
     return board_2_str
@@ -187,8 +187,18 @@ def check_end_state(
 
     # raise NotImplementedError()
 
+def get_valid_columns(board:np.ndarray):
+    # print('s')
+    valid_columns = []
+    for col in range(COLUMNS):
+        if board[ROWS - 1][col] == 0:
+            valid_columns.append(col)
+    return valid_columns
+
 class SavedState:
     pass
+
+
 
 
 GenMove = Callable[
