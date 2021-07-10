@@ -158,7 +158,7 @@ class MonteCarloTreeSearchNode():
 
     def rollout_policy(self, possible_moves):
 
-        return possible_moves[np.random.randint(len(possible_moves))]
+        return possible_moves[np.random.choice(len(possible_moves))]
 
     def _tree_policy(self):
 
@@ -172,7 +172,7 @@ class MonteCarloTreeSearchNode():
         return current_node
 
     def best_action(self):
-        simulation_no = 200
+        simulation_no = 1000
 
         for i in range(simulation_no):
             v = self._tree_policy()

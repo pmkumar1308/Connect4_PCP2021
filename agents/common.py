@@ -54,7 +54,7 @@ def pretty_print_board(board: np.ndarray) -> str:
 
     """
 
-    board = np.flip(board, 0)  # flip vertically to get board[x][y] in lower left
+    # board = np.flipud(board)  # flip vertically to get board[x][y] in lower left
     print('|===============|')
     pp_string = str('')
     for y in range(ROWS):
@@ -92,18 +92,21 @@ def apply_player_action(
     Sets board[i, action] = player, where i is the lowest open row. The modified
     board is returned. If copy is True, makes a copy of the board before modifying it.
     """
-    board = np.flip(board, 0)
+    # board = np.flip(board, 0)
+    # print('Action', action)
+    board_copy = board
 
     if copy:
-        board_copy = board
+        board_copy = board.copy()
 
-    for row in range(board.shape[0]):
-        if board[row][action] == 0:
+    for row in range(board_copy.shape[0]):
+        if board_copy[row][action] == 0:
             lowest_open_row = row
 
-    board[lowest_open_row, action] = player
+    board_copy[lowest_open_row, action] = player
 
-    return board
+
+    return board_copy
     # raise NotImplementedError()
 
 
@@ -189,11 +192,27 @@ def check_end_state(
 
 def get_valid_columns(board:np.ndarray):
     # print('s')
+
     valid_columns = []
     for col in range(COLUMNS):
-        if board[ROWS - 1][col] == 0:
+        if board[ROWS - 1, col] == 0:
             valid_columns.append(col)
+    print(valid_columns)
     return valid_columns
+
+
+# valid_actions = []
+# for action in range(len(board[0])):
+#     if is_action_valid(board, action):
+#         valid_actions.append(action)
+# return valid_actions
+#
+#
+# def is_action_valid(board: np.ndarray, action: PlayerAction):
+#     """
+#     Returns True if the current action is a valid action
+#     """
+#     return board[len(board) - 1, action] == NO_PLAYER
 
 class SavedState:
     pass
