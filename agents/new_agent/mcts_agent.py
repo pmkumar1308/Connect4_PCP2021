@@ -42,19 +42,18 @@ class MonteCarloTreeSearchNode():
         self.results[1] = 0
         self.results[-1] = 0
 
-
         return
 
     def find_remaining_actions(self):
         self.remaining_actions = get_valid_columns(self.state)
         return self.remaining_actions
 
-    def q(self):
+    def score(self):
         wins = self.results[1]
         loses = self.results[-1]
         return wins - loses
 
-    def n(self):
+    def num_visits(self):
         return self.number_of_visits
 
     def expand(self):
@@ -90,15 +89,15 @@ class MonteCarloTreeSearchNode():
     def is_fully_expanded(self):
         return len(self.remaining_actions) == 0
 
-    def best_child(self, c_param=1.414):
+    def best_child(self, exploration_param=1.414):
 
-        choices_weights = [(c.q() / c.n()) + c_param * np.sqrt((2 * np.log(self.n()) / c.n())) for c in self.children]
+        choices_weights = [(c.score() / c.num_visits()) + exploration_param * np.sqrt((2 * np.log(self.num_visits()) / c.num_visits())) for c in self.children]
         return self.children[np.argmax(choices_weights)]
 
     def rollout_policy(self, possible_moves):
         return np.random.choice(possible_moves)
 
-    def _tree_policy(self):
+    def tree_policy(self):
 
         current_node = self
         while current_node.is_fully_expanded():
@@ -115,7 +114,7 @@ class MonteCarloTreeSearchNode():
         simulation_no = 1000
 
         for i in range(simulation_no):
-            self._tree_policy()
+            self.tree_policy()
 
         return self.best_child()
 
