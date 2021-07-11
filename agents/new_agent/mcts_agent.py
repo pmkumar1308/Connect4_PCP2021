@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2, \
     connected_four, ROWS, \
     COLUMNS, apply_player_action, get_valid_columns, \
-    check_end_state, GameState, get_opponent
+    check_end_state, GameState, get_opponent_player
 
 
 # MCTS Steps
@@ -73,11 +73,7 @@ class MonteCarloTreeSearchNode():
 
             action = self.rollout_policy(possible_moves)
             current_rollout_state = self.move(current_rollout_state, action, player_)
-            if player_ == PLAYER2:
-                player_ = PLAYER1
-            else:
-                player_ = PLAYER2
-
+            player_ == get_opponent_player(player_)
         return self.game_result(current_rollout_state, player_)
 
     def backpropagate(self, result):
@@ -120,7 +116,7 @@ class MonteCarloTreeSearchNode():
 
 
     def is_game_over(self, curr_state, player):
-        if check_end_state(curr_state,player) == GameState.STILL_PLAYING or check_end_state(curr_state,get_opponent(player)) == GameState.STILL_PLAYING:
+        if check_end_state(curr_state,player) == GameState.STILL_PLAYING or check_end_state(curr_state,get_opponent_player(player)) == GameState.STILL_PLAYING:
             return False
         else:
             return True
@@ -133,11 +129,11 @@ class MonteCarloTreeSearchNode():
 
         curr_player = player_r
         game_state = check_end_state(curr_state, curr_player).name
-        if game_state == 'IS_WIN' and self.player == PLAYER2:
+        if game_state == 'IS_WIN' and player_r == PLAYER2:
             return 1
         if game_state == 'IS_DRAW':
             return 0
-        if game_state == 'IS_WIN' and self.player == PLAYER1:
+        if game_state == 'IS_WIN' and player_r == PLAYER1:
             return -1
 
 

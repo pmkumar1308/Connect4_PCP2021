@@ -159,8 +159,11 @@ class SavedState:
     pass
 
 
-def get_opponent(current_player: BoardPiece) -> BoardPiece:
-    return PLAYER2 if current_player == PLAYER1 else PLAYER1
+def get_opponent_player(player: BoardPiece) -> BoardPiece:
+    if player == PLAYER1:
+        return PLAYER2
+    else:
+        return PLAYER1
 
 GenMove = Callable[
     [np.ndarray, BoardPiece, Optional[SavedState]],  # Arguments for the generate_move function
