@@ -1,7 +1,7 @@
 import numpy as np
 from collections import defaultdict
 from typing import Optional, Tuple
-from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2, connected_four_convolve, \
+from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2, \
     connected_four, ROWS, \
     COLUMNS, apply_player_action, get_valid_columns, \
     check_end_state, GameState, get_opponent
@@ -25,71 +25,6 @@ from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2
 # UCB
 # helps in selection of the next node based on the simulation. Used to balance the exploration
 # and exploitation from existing information
-
-
-# class MCTSNode:
-#
-#     def __init__(self, parent, move):
-#         # self, board: np.ndarray, player: BoardPiece,
-#         # self.game_state = board
-#         self.parent = parent
-#         self.exploration_param = np.sqrt(2)
-#         self.num_simulations = 200
-#         # self.player = player
-#         self._visits = 0
-#         self._wins = 0
-#         self.move = move
-#         self.child_states = []
-#
-#     def expand(self, game_state, player):
-#         valid_cols = get_valid_columns(game_state)
-#         while check_end_state(game_state, player) == GameState.STILL_PLAYING:
-#             for col in valid_cols:
-#                 new_child = MCTSNode(col, self)
-#                 self.child_states.append(new_child)
-#
-#     def update(self, results):
-#         self._visits += 1
-#         if results == GameState.IS_WIN:
-#             self.wins +=1
-#
-#     def is_terminal(self):
-#         return len(self.child_states) == 0
-#
-#     def has_parent(self):
-#         if self.parent is not None:
-#             return True
-#         return False
-#
-#     def best_child_state(self,exploration_param = 1.414):
-#         choices_weights = [(c.q() / c.n()) + exploration_param * np.sqrt((2 * np.log(self.n()) / c.self._visits)) for c in self.child_states]
-#         return self.child_states[np.argmax(choices_weights)]
-#
-# def tree_policy():
-#
-#
-# def gen_mcts_best_action(board: np.ndarray,player: BoardPiece):
-#     state = board
-#     root_node = MCTSNode(None, None)
-#     while time remains:
-#         n, s = root_node, state.copy
-#         while not n.is_terminal():  # select leaf
-#             n = tree_policy_child(n)
-#             s.addmove(n.move)
-#         n.expand(s,player)  # expand
-#         n = tree_policy(n)
-#
-#         while not check_end_state(s, player) == GameState.STILL_PLAYING:  # simulate
-#             s = simulation_policy_child(s)
-#
-#         result = evaluate(s)
-#
-#         while n.has_parent():  # propagate
-#             n.update(result)
-#             n = n.parent
-#
-#         action = PlayerAction(int(col_))
-#         return action
 
 class MonteCarloTreeSearchNode():
 
@@ -163,7 +98,6 @@ class MonteCarloTreeSearchNode():
         return self.children[np.argmax(choices_weights)]
 
     def rollout_policy(self, possible_moves):
-        # print((possible_moves))
         return np.random.choice(possible_moves)
 
     def _tree_policy(self):

@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from typing import Optional, Tuple
-from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2, connected_four_convolve, connected_four,ROWS, \
+from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2, connected_four,ROWS, \
     COLUMNS,apply_player_action, \
     check_end_state, GameState
 import random
