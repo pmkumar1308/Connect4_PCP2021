@@ -91,9 +91,9 @@ from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2
 #         action = PlayerAction(int(col_))
 #         return action
 
-class MonteCarloTreeSearchNode():
+class MonteCarloTreeSearch():
 
-    def __init__(self, state, player, parent=None, parent_action=None):
+    def __init__(self, state, player: BoardPiece, parent=None, parent_action=None):
         self.state = state
         self.parent = parent
         self.parent_action = parent_action
@@ -122,8 +122,8 @@ class MonteCarloTreeSearchNode():
 
     def expand(self):
         action = self._untried_actions.pop()
-        next_state = self.move(action)
-        child_node = MonteCarloTreeSearchNode(
+        next_state = self.move(self.state,action, self.player) #Should I be using self.state
+        child_node = MonteCarloTreeSearch(
             next_state, player=self.player, parent=self, parent_action=action)
 
         self.children.append(child_node)
@@ -133,14 +133,19 @@ class MonteCarloTreeSearchNode():
         return self.is_game_over()
 
     def rollout(self):
-        current_rollout_state = self.state
-
+        current_rollout_state = self.state.copy()
+        player_ = self.player
         while not self.is_game_over():
             possible_moves = get_valid_columns(current_rollout_state)
 
             action = self.rollout_policy(possible_moves)
-            current_rollout_state = self.move(action)
-        return self.game_result()
+            current_rollout_state = self.move(current_rollout_state, action, player_)
+            if player_ == PLAYER2:
+                player_ = PLAYER1
+            else:
+                player_ = PLAYER2
+
+        return self.game_result(player_)
 
     def backpropagate(self, result):
         self._number_of_visits += 1.
@@ -183,22 +188,28 @@ class MonteCarloTreeSearchNode():
 
 
     def is_game_over(self):
-        return connected_four(self.state, self.player)
+        ans = connected_four(self.state, self.player)
+        return ans
 
-    def move(self, action):
-        b = apply_player_action(self.state, action, self.player)
+    def move(self, board, action, player_playing):
+        b = apply_player_action(board, action, player_playing, True)
         return b
 
-    def game_result(self):
-        if check_end_state(self.state, self.player).name == GameState.IS_WIN:
+    def game_result(self,player_r):
+        curr_player = player_r
+        game_state = check_end_state(self.state, curr_player).name
+        if game_state == 'IS_WIN' and self.player == PLAYER2:
             return 1
-        if check_end_state(self.state, self.player).name == GameState.IS_DRAW:
+        if game_state == 'IS_DRAW':
             return 0
+        if game_state == 'IS_WIN' and self.player == PLAYER1:
+            return -1
+
 
 
 def generate_move_mcts(board: np.ndarray, player: BoardPiece, saved_state: Optional[SavedState]
                        ) -> Tuple[PlayerAction, Optional[SavedState]]:
-    root = MonteCarloTreeSearchNode(state=board, player=player)
+    root = MonteCarloTreeSearch(state=board, player=player)
     # print('a')
     selected_node = root.best_action()
     # print('The selected node is',selected_node)
