@@ -58,7 +58,7 @@ class MonteCarloTreeSearchNode():
 
     def expand(self):
         action = self.remaining_actions.pop()
-        next_state = self.move(self.state, action, self.player)  # Should I be using self.state
+        next_state = self.move(self.state, action, self.player)
         child_node = MonteCarloTreeSearchNode(
             next_state, player=self.player, parent=self, parent_action=action)
 
