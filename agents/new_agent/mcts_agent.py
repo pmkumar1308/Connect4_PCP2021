@@ -4,7 +4,7 @@ from typing import Optional, Tuple
 from agents.common import PlayerAction, SavedState, BoardPiece, PLAYER1, PLAYER2, connected_four_convolve, \
     connected_four, ROWS, \
     COLUMNS, apply_player_action, get_valid_columns, \
-    check_end_state, GameState
+    check_end_state, GameState, get_opponent
 
 
 # MCTS Steps
@@ -163,40 +163,54 @@ class MonteCarloTreeSearchNode():
         return self.children[np.argmax(choices_weights)]
 
     def rollout_policy(self, possible_moves):
-
-        return possible_moves[np.random.choice(len(possible_moves))]
+        # print((possible_moves))
+        return np.random.choice(possible_moves)
 
     def _tree_policy(self):
 
         current_node = self
-        while not current_node.is_terminal_node(self.state, self.player):
+        while current_node.is_fully_expanded():
+            current_node = current_node.best_child()
 
-            if not current_node.is_fully_expanded():
-                return current_node.expand()
-            else:
-                current_node = current_node.best_child()
-        return current_node
+        # fully_expanded_node = current_node
+        if current_node._number_of_visits != 0:
+            current_node = current_node.expand()
+
+        reward = current_node.rollout()
+        current_node.backpropagate(reward)
 
     def best_action(self):
         simulation_no = 1000
 
         for i in range(simulation_no):
-            v = self._tree_policy()
-            reward = v.rollout()
-            v.backpropagate(reward)
+            self._tree_policy()
 
         return self.best_child()
 
 
     def is_game_over(self, curr_state, player):
-        ans = connected_four(curr_state, player)
-        return ans
+        if check_end_state(curr_state,player) == GameState.STILL_PLAYING or check_end_state(curr_state,get_opponent(player)) == GameState.STILL_PLAYING:
+            return False
+        else :
+            return True
 
     def move(self, board, action, player_playing):
+
+
+
         b = apply_player_action(board, action, player_playing, True)
         return b
 
     def game_result(self, curr_state, player_r):
+        """
+
+        :param curr_state:
+        :type curr_state:
+        :param player_r:
+        :type player_r:
+        :return:
+        :rtype:
+        """
         curr_player = player_r
         game_state = check_end_state(curr_state, curr_player).name
         if game_state == 'IS_WIN' and self.player == PLAYER2:

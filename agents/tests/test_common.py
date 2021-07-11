@@ -35,7 +35,7 @@ def test_string_to_board() -> str:
 
     assert isinstance(ret,np.ndarray)
 
-def test_apply_player_action:
+def test_apply_player_action():
 
     test_board = initialize_game_state()
     ret = pretty_print_board(test_board)
