@@ -144,6 +144,6 @@ class MonteCarloTreeSearchNode():
 def generate_move_mcts(board: np.ndarray, player: BoardPiece, saved_state: Optional[SavedState]
                        ) -> Tuple[PlayerAction, Optional[SavedState]]:
     root = MonteCarloTreeSearchNode(state=board, player=player)
-    selected_node = root.best_action()
-    action = PlayerAction(int(selected_node.parent_action))
+    best_node = root.best_action()
+    action = PlayerAction(int(best_node.parent_action))
     return action, saved_state

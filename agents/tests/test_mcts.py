@@ -39,4 +39,27 @@ def test_expand():
     assert (test_child.state == test_next_state).all()
 
 
-def test_rollout():
+# def test_rollout():
+
+def test_game_result():
+    """
+    Checks if the game_result_function returns 1,0,-1 based on win,draw or lose for the AI
+    player
+    """
+    #Checking win condition
+    test_board = initialize_game_state()
+    test_board[0:2, 1] = 1
+    test_board[0:4, 3] = 2
+    test_board[1:2, 6] = 1
+    test_node = mcts_agent.MonteCarloTreeSearchNode(state=test_board, player=PLAYER2)
+    ret = test_node.game_result(test_board, PLAYER2)
+    assert (ret == 1)
+
+    # Checking lose condition
+    test_board = initialize_game_state()
+    test_board[0:2, 1] = 1
+    test_board[0:4, 3] = 1
+    test_board[1:3, 6] = 2
+    test_node = mcts_agent.MonteCarloTreeSearchNode(state=test_board, player=PLAYER1)
+    ret = test_node.game_result(test_board, PLAYER1)
+    assert (ret == -1)
