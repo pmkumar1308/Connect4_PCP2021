@@ -10,11 +10,33 @@ def test_find_remaining_actions():
     are fully filled with 1
     """
     test_board = initialize_game_state()
-    test_board[:,1] = 1
+    test_board[:, 1] = 1
     test_board[:, 3] = 1
-    test_node = mcts_agent.MonteCarloTreeSearchNode(state=test_board,player = PLAYER2)
+    test_node = mcts_agent.MonteCarloTreeSearchNode(state=test_board, player=PLAYER2)
     test_remain_actions = test_node.find_remaining_actions()
-    actual_actions_remaining =[0,2,4,5,6]
+    actual_actions_remaining = [0, 2, 4, 5, 6]
     assert (test_remain_actions == actual_actions_remaining)
 
-def expand():
+
+def test_expand():
+    """
+    Compares the child state in child node with a test_next_state
+    and remaining actions before and after expansion
+    of current state given by test board
+    """
+    test_board = initialize_game_state()
+    test_board[0:2, 1] = 1
+    test_board[0:3, 3] = 2
+    test_board[:, 6] = 1
+    test_node = mcts_agent.MonteCarloTreeSearchNode(state=test_board, player=PLAYER2)
+    assert (len(test_node.remaining_actions) == 6) # remaining actions before expansion
+    assert (test_node.remaining_actions[-1] == 5)
+    test_action = test_node.remaining_actions[-1]
+    test_child = test_node.expand()
+    test_next_state = apply_player_action(test_board, test_action, PLAYER2)
+    test_action = test_node.remaining_actions[-1] #after expansion
+    assert (test_action == 4) # taking the last remaining action
+    assert (test_child.state == test_next_state).all()
+
+
+def test_rollout():

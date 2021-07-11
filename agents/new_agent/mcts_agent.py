@@ -91,8 +91,8 @@ class MonteCarloTreeSearchNode():
 
     def best_child(self, exploration_param=1.414):
 
-        choices_weights = [(c.score() / c.num_visits()) + exploration_param * np.sqrt((2 * np.log(self.num_visits()) / c.num_visits())) for c in self.children]
-        return self.children[np.argmax(choices_weights)]
+        ucb_scores = [(c.score() / c.num_visits()) + exploration_param * np.sqrt((2 * np.log(self.num_visits()) / c.num_visits())) for c in self.children]
+        return self.children[np.argmax(ucb_scores)]
 
     def rollout_policy(self, possible_moves):
         return np.random.choice(possible_moves)
