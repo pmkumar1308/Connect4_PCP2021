@@ -44,6 +44,17 @@ class MonteCarloTreeSearchNode():
 
         return
 
+    def expand(self):
+
+        action = self.remaining_actions.pop()
+        next_state = self.apply_move(self.state, action, self.player)
+
+        child_node = MonteCarloTreeSearchNode(
+            next_state, player=self.player, parent=self, parent_action=action)
+
+        self.children.append(child_node)
+        return child_node
+
     def find_remaining_actions(self):
         self.remaining_actions = get_valid_columns(self.state)
         return self.remaining_actions
@@ -56,24 +67,14 @@ class MonteCarloTreeSearchNode():
     def num_visits(self):
         return self.number_of_visits
 
-    def expand(self):
-        action = self.remaining_actions.pop()
-        next_state = self.move(self.state, action, self.player)
-        child_node = MonteCarloTreeSearchNode(
-            next_state, player=self.player, parent=self, parent_action=action)
-
-        self.children.append(child_node)
-        return child_node
-
     def rollout(self):
         current_rollout_state = self.state
         player_ = self.player
         while not self.is_game_over(current_rollout_state, player_):
             possible_moves = get_valid_columns(current_rollout_state)
-
             action = self.rollout_policy(possible_moves)
-            current_rollout_state = self.move(current_rollout_state, action, player_)
-            player_ == get_opponent_player(player_)
+            current_rollout_state = self.apply_move(current_rollout_state, action, player_)
+            player_ = get_opponent_player(player_)
         return self.game_result(current_rollout_state, player_)
 
     def backpropagate(self, result):
@@ -111,19 +112,7 @@ class MonteCarloTreeSearchNode():
 
         for i in range(simulation_no):
             self.tree_policy()
-
         return self.best_child()
-
-
-    def is_game_over(self, curr_state, player):
-        if check_end_state(curr_state,player) == GameState.STILL_PLAYING or check_end_state(curr_state,get_opponent_player(player)) == GameState.STILL_PLAYING:
-            return False
-        else:
-            return True
-
-    def move(self, board, action, player_playing):
-        b = apply_player_action(board, action, player_playing, True)
-        return b
 
     def game_result(self, curr_state, player_r):
 
@@ -135,6 +124,18 @@ class MonteCarloTreeSearchNode():
             return 0
         if game_state == 'IS_WIN' and player_r == PLAYER1:
             return -1
+
+    def is_game_over(self, curr_state, player):
+        if check_end_state(curr_state, player) == GameState.STILL_PLAYING or check_end_state(curr_state,
+                                                                                             get_opponent_player(
+                                                                                 player)) == GameState.STILL_PLAYING:
+            return False
+        else:
+            return True
+
+    def apply_move(self, board, action, player_playing):
+        b = apply_player_action(board, action, player_playing, True)
+        return b
 
 
 def generate_move_mcts(board: np.ndarray, player: BoardPiece, saved_state: Optional[SavedState]
