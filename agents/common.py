@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Optional
 import numpy as np
 from typing import Callable, Tuple
-from scipy.signal.sigtools import _convolve2d
+from scipy.signal import convolve2d
 
 BoardPiece = np.int8  # The data type (dtype) of the board
 NO_PLAYER = BoardPiece(0)  # board[i, j] == NO_PLAYER where the position is empty
@@ -121,7 +121,7 @@ def connected_four(
     board[board == player] = BoardPiece(1)
 
     for kernel in (col_kernel, row_kernel, dia_l_kernel, dia_r_kernel):
-        result = _convolve2d(board, kernel, 1, 0, 0, BoardPiece(0))
+        result = convolve2d(board, kernel, mode='valid', boundary='fill', fillvalue=BoardPiece(0))
         if np.any(result == 4):
             return True
     return False
